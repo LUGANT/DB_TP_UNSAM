@@ -1,56 +1,33 @@
 from flask import Flask, jsonify
-from flask_mysqldb import MySQL
 
-from db import Database
+from dbMySQL import MySQLDataBase
 
 # Initializing flask app
 flaskApp = Flask(__name__)
+mysqldb = MySQLDataBase()
 
-flaskApp.config['MYSQL_HOST'] = 'localhost'
-flaskApp.config['MYSQL_USER'] = 'root'
-flaskApp.config['MYSQL_PASSWORD'] = 'masu'
-flaskApp.config['MYSQL_DB'] = 'tp_basededatos'
 
-db = Database(flaskApp)
-
-@flaskApp.route('/productos')
-def getProductos():
-    # productosJSON = fromProductoToJSON(ProductoService().getProductos())
-    # return jsonify(productosJSON)
-    pass
+# ---------------------------------------------------------
 
 @flaskApp.route('/productos/sector/<sector>')
 def getProductosSector(sector:str):
-    return jsonify(db.getProductoSector(sector))
+    return jsonify(mysqldb.getProductoSector(sector))
 
 @flaskApp.route('/productos/repositor/<repositor>')
 def getProductosRepositor(repositor:str):
-    return jsonify(db.getProductoRepositor(repositor))
-
-@flaskApp.route('/productos/db')
-def getProductosDB() ->  None:
-    cursor = db.connection.cursor()
-
-    cursor.execute('''select * from producto''')
-
-    datos = cursor.fetchall()
-
-    cursor.close()
-
-    print(datos)
-    print(type(datos))
+    return jsonify(mysqldb.getProductoRepositor(repositor))
 
 #---------------------------------------------------------
 
 @flaskApp.route('/repositores')
 def getRepositores():
-    return jsonify(db.getRepositoresDB())
+    return jsonify(mysqldb.getRepositoresDB())
 
 #---------------------------------------------------------
 
 @flaskApp.route('/sectores')
 def getSectores():
-    return jsonify(db.getSectoresDB())
+    return jsonify(mysqldb.getSectoresDB())
 
 # Running app
 if __name__ == '__main__':

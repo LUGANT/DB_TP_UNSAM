@@ -1,51 +1,45 @@
-from flask_mysqldb import MySQL
-from flask import Flask
+from mysql.connector import connection
 
-class Database:
-    def __init__(self, app:Flask):
-        app.config['MYSQL_HOST'] = '127.0.0.1'
-        app.config['MYSQL_PORT'] = '3306'
-        app.config['MYSQL_USER'] = 'root'
-        app.config['MYSQL_PASSWORD'] = 'masu'
-        app.config['MYSQL_DB'] = 'tp_basededatos'
-        app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+class MySQLDataBase():
+    
+    def __init__(self) -> None:
+        self.user = 'root'
+        self.password = '1234'
+        self.host = 'localhost'
+        self.database = 'tp_basededatos'
 
-        # Inicialización de la extensión MySQL
-        self.mysql = MySQL(app)
+    def getConnection(self):
+        return connection.MySQLConnection(
+                                user=self.user, 
+                                password=self.password,
+                                host=self.host,
+                                database=self.database)
+    
+    def _getNamesDB(self, docstring: str):
+        connection = self.getConnection()
+        cursor = connection.cursor(dictionary=True)
 
-    def get_connection(self):
-        return self.mysql.connection
+        query = (docstring)
+
+        cursor.execute(query)
+        names = cursor.fetchall()
+
+        print(names)
+
+        cursor.close()
+        connection.close()
+        return names
 
     def getRepositoresDB(self):
-        cursor = self.get_connection().cursor()
+        return self._getNamesDB('''select nombre from repositor''')
 
-        cursor.execute('''
-        select nombre from repositor
-        ''')
-        datos = cursor.fetchall()
-        cursor.close()
-
-        return datos
-
-    def checkConnection(self):
-        cur = self.mysql.connection.cursor()
-        cur.execute("SELECT 1")
-        result = cur.fetchone()
-        return result
 
     def getSectoresDB(self):
-        cursor = self.get_connection().cursor()
+        return self._getNamesDB('''select desc_sector from sector''')
 
-        cursor.execute('''
-        select desc_sector from sector
-        ''')
-        datos = cursor.fetchall()
-        cursor.close()
-
-        return datos
-
-    def getProductoSector(self, sector):
-        cursor = self.get_connection().cursor()
+    def getProductoSector(self, sector:str):
+        connection = self.getConnection()
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(f'''
         select id_sector from sector
@@ -54,7 +48,7 @@ class Database:
 
         idSector = cursor.fetchall()[0]['id_sector']
         print(idSector)
-        
+
         cursor.execute(f'''
         select gp.id_producto, pr.nombre as 'Nombre Producto', g.nombre as 'Nombre Gondola', p.desc_presentacion as 'Descripcion presentacion' from gondola_producto gp
         left join presentacion p on gp.presentacion_id_presentacion = p.id_presentacion
@@ -63,14 +57,16 @@ class Database:
         left join gondola_producto_repositor gpr on gpr.id_Gondola = gp.id_Gondola and gpr.id_Producto = gp.id_Producto
         where g.id_Sector = {idSector}
         ''')
+
         datos = cursor.fetchall()
         print(datos)
         cursor.close()
 
         return datos
-
+    
     def getProductoRepositor(self, repositor):
-        cursor = self.get_connection().cursor()
+        connection = self.getConnection()
+        cursor = connection.cursor(dictionary=True)
 
         cursor.execute(f'''
         select id_repositor from repositor
@@ -86,7 +82,6 @@ class Database:
         left join producto pr on pr.id_Producto = gp.id_producto
         left join gondola g on gp.id_Gondola = g.id_gondola
         left join gondola_producto_repositor gpr on gpr.id_Gondola = gp.id_Gondola and gpr.id_Producto = gp.id_Producto
-
         where gpr.id_repositor = {idRepositor}
         ''')
         datos = cursor.fetchall()
