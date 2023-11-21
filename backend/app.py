@@ -11,7 +11,7 @@ mysqldb = MySQLDataBase()
 
 @flaskApp.route('/productos/sector/<sector>')
 def getProductosSector(sector:str):
-    return jsonify(mysqldb.getProductoSector(sector))
+    return jsonify( mysqldb.getProductoSector(sector))
 
 @flaskApp.route('/productos/repositor/<repositor>')
 def getProductosRepositor(repositor:str):
@@ -21,7 +21,7 @@ def getProductosRepositor(repositor:str):
 
 @flaskApp.route('/repositores')
 def getRepositores():
-    return jsonify(mysqldb.getRepositoresDB())
+    return jsonify( mysqldb.getRepositoresDB())
 
 #---------------------------------------------------------
 

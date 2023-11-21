@@ -24,8 +24,6 @@ class MySQLDataBase():
         cursor.execute(query)
         names = cursor.fetchall()
 
-        print(names)
-
         cursor.close()
         connection.close()
         return names
@@ -47,7 +45,6 @@ class MySQLDataBase():
         ''')
 
         idSector = cursor.fetchall()[0]['id_sector']
-        print(idSector)
 
         cursor.execute(f'''
         select gp.id_producto, pr.nombre as 'Nombre Producto', g.nombre as 'Nombre Gondola', p.desc_presentacion as 'Descripcion presentacion' from gondola_producto gp
@@ -74,7 +71,6 @@ class MySQLDataBase():
         ''')
 
         idRepositor = cursor.fetchall()[0]['id_repositor']
-        print(idRepositor)
         
         cursor.execute(f'''
         select gp.id_producto, pr.nombre as 'Nombre Producto', g.nombre as 'Nombre Gondola', p.desc_presentacion as 'Descripcion presentacion' from gondola_producto gp
