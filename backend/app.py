@@ -6,7 +6,6 @@ from dbMySQL import MySQLDataBase
 flaskApp = Flask(__name__)
 mysqldb = MySQLDataBase()
 
-
 # ---------------------------------------------------------
 
 @flaskApp.route('/productos/sector/<sector>')
@@ -21,7 +20,7 @@ def getProductosRepositor(repositor:str):
 
 @flaskApp.route('/repositores')
 def getRepositores():
-    return jsonify( mysqldb.getRepositoresDB())
+    return jsonify(mysqldb.getRepositoresDB())
 
 #---------------------------------------------------------
 

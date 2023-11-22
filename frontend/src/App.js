@@ -1,77 +1,162 @@
 // Importing modules
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Box, Radio, VStack, Text, RadioGroup, Select, HStack, Button, TableContainer, Table } from "@chakra-ui/react";
-import { fetchProductosRepositor,fetchProductosSector,fetchRepositorioNames,fetchSectorNames } from "./services/queryService";
+import { Box, Radio, VStack, Text, RadioGroup, Select, HStack, Button, TableContainer, Table, FormControl, FormLabel, Thead, Tr, Th, Tbody, Td, useToast } from "@chakra-ui/react";
+
+async function getSectores() {
+    try {
+        const responseSectores = await fetch('/sectores')
+        const sectores = await responseSectores.json()
+        // console.log(sectores.data)
+        console.log(sectores)
+        return sectores
+    }catch(error) {
+        console.log(error)
+    }
+}
+
+async function getRepositores() {
+    try{
+        const responseRepositores = await fetch('/repositores')
+        const repositores = await responseRepositores.json()
+        console.log(repositores)
+        return repositores
+    }catch(error){
+        console.log(error)
+    }
+}
+
+async function getProductos(boolValue, nameValue) {
+
+    const typePath = (boolValue) ? 'sector' : 'repositor'
+
+    try{
+        const productos = await fetch(`/productos/${typePath}/${nameValue}`)
+        const productosJSON = await productos.json()
+        console.log(productosJSON)
+        return productosJSON
+    }catch(error){
+        console.log(error)
+    }
+}
+
 
 function App() {
     // usestate for setting a javascript
     // object for storing and using data
+    const [productos, setProductos] = useState([])
     const [sectores, setSectores] = useState([])
     const [repositores, setRepositores] = useState([])
-    const [productos, setProductos] = useState([])
- 
-    function getSectores() {
-        try {
-            fetch('/sectores')
-                .then( response => response.json() )
-                .then( data => {
-                    console.log(data)
-                setSectores(data)
-        })
-        } catch(error) {
-            console.log(error)
-        }
+    const [selectedOption, setSelectedOption] = useState(true)
+    const [selectedRepositor, setSelectedRepositor] = useState("")
+    const [selectedSector, setSelectedSector] = useState("")
+    const toast = useToast()
+    // true - sectores
+    // false - repositores
+
+    const fetchData = async () => {
+        const repos = await getRepositores();
+        const sects = await getSectores();
+        
+        setRepositores(repos);
+        setSectores(sects);
+        setSelectedRepositor(repos[0].nombre);
+        setSelectedSector(sects[0].desc_sector);
     }
 
-    async function getRepositores() {
-        try{
-            fetch('/repositores')
-                .then( response => response.json() )
-                .then( data => {
-                setSectores(data)
-        })
-        }catch(error){
-            console.log(error)
+    const buscarProductos = async (boolValue) => {
+
+        
+        const nameValue = (boolValue) ? selectedSector : selectedRepositor
+        
+        const productosBusqueda = await getProductos(boolValue, nameValue)
+        
+        if (productosBusqueda.length){
+            setProductos(productosBusqueda)
+        }else{
+            toast({
+                title: 'No se encontraron productos',
+                description: `No se encontraron productos para ${nameValue}`,
+                status: 'info',
+                duration: 5000,
+                isClosable: true,
+            })
+            
         }
+
+    }
+    
+    const handleRadioChange = () => {
+        setSelectedOption(!selectedOption)
+        console.log(selectedOption)
     }
 
-    // Using useEffect for single rendering
     useEffect(() => {
-        getSectores()
-        getRepositores()
-    }, []);
+        fetchData()
+    },[])
 
     return (
         <Box bg='#23272f' w={'100vw'} h={'100vh'}>
+            <FormControl>
 
-            <RadioGroup defaultValue="1">
-                <VStack>
-                <Radio value="1">
-                    <HStack>
-                        <Text color={'#f6f7f9'}>Sector</Text>
-                        <Select placeholder="Sector">
-                            {
-                                sectores.map((sector) => 
-                                <option>{sector.desc_sector}</option>)
-                            }
-                        </Select>
-                    </HStack>
-                </Radio>
-                <Radio value="2">
-                    <HStack>
-                        <Text color={'#f6f7f9'}>Repositor</Text>
-                        <Select placeholder="Repositor">
+            <VStack>
 
-                        </Select>
+                <FormLabel color={'#f6f7f9'}>
+                    Consulta de Productos
+                </FormLabel>
+
+                <RadioGroup defaultValue="1" onChange={handleRadioChange}>
+
+                    <HStack>
+                        <Radio value="1" />
+                            <Text color={'#f6f7f9'}>Sector</Text>
+                            <Select bg={'#f6f7f9'} onChange={(event) => setSelectedSector(event.target.value)}>
+                                {sectores.map((sector, index) => 
+                                    <option key={index}>{sector.desc_sector}</option>)
+                                }
+                            </Select >
+
                     </HStack>
-                </Radio>
-                    <Button>Buscar producto</Button>
-                </VStack>
-            </RadioGroup>
+
+                    <HStack>
+                        <Radio value="2"/>
+                            <Text color={'#f6f7f9'}>Repositor</Text>
+                            <Select bg={'#f6f7f9'} onChange={(event) => setSelectedRepositor(event.target.value)}>
+                                {
+                                    repositores.map((repositor, index) => 
+                                    <option key={index}>{repositor.nombre}</option>)
+                                }
+                            </Select>
+                    </HStack>
+
+                </RadioGroup>
+
+                <Button onClick={() => buscarProductos(selectedOption)}>Buscar producto</Button>
+
+            </VStack>
+
+            </FormControl>
 
             <TableContainer>
-                <Table>
+                <Table color={"white"}>
+                    <Thead>
+                        <Tr>
+                            <Th>ID Producto</Th>
+                            <Th>Nombre Producto</Th>
+                            <Th>Nombre Gondola</Th>
+                            <Th>Descripcion Presentacion</Th>
+                        </Tr>
+                    </Thead>
+                    <Tbody>
+                        {productos.map(producto => 
+                        <Tr key={producto.id}>
+                            <Td>{producto.id}</Td>
+                            <Td>{producto.nombre_producto}</Td>
+                            <Td>{producto.nombre_gondola}</Td>
+                            <Td>{producto.descripcion_presentacion}</Td>
+                        </Tr>
+                        )}
+                    </Tbody>
                 </Table>
             </TableContainer>
 

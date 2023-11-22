@@ -47,7 +47,7 @@ class MySQLDataBase():
         idSector = cursor.fetchall()[0]['id_sector']
 
         cursor.execute(f'''
-        select gp.id_producto, pr.nombre as 'Nombre Producto', g.nombre as 'Nombre Gondola', p.desc_presentacion as 'Descripcion presentacion' from gondola_producto gp
+        select gp.id_producto as 'id', pr.nombre as 'nombre_producto', g.nombre as 'nombre_gondola', p.desc_presentacion as 'descripcion_presentacion' from gondola_producto gp
         left join presentacion p on gp.presentacion_id_presentacion = p.id_presentacion
         left join producto pr on pr.id_Producto = gp.id_producto
         left join gondola g on gp.id_Gondola = g.id_gondola
@@ -73,7 +73,7 @@ class MySQLDataBase():
         idRepositor = cursor.fetchall()[0]['id_repositor']
         
         cursor.execute(f'''
-        select gp.id_producto, pr.nombre as 'Nombre Producto', g.nombre as 'Nombre Gondola', p.desc_presentacion as 'Descripcion presentacion' from gondola_producto gp
+        select gp.id_producto as 'id', pr.nombre as 'nombre_producto', g.nombre as 'nombre_gondola', p.desc_presentacion as 'descripcion_presentacion' from gondola_producto gp
         left join presentacion p on gp.presentacion_id_presentacion = p.id_presentacion
         left join producto pr on pr.id_Producto = gp.id_producto
         left join gondola g on gp.id_Gondola = g.id_gondola
