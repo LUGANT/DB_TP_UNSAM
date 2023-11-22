@@ -1,7 +1,7 @@
 // Importing modules
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { Box, Radio, VStack, Text, RadioGroup, Select, HStack, Button, TableContainer, Table, FormControl, FormLabel, Thead, Tr, Th, Tbody, Td, useToast } from "@chakra-ui/react";
+import { Radio, VStack, Text, RadioGroup, Select, HStack, Button, TableContainer, Table, Thead, Tr, Th, Tbody, Td, useToast, Stack, StackDivider } from "@chakra-ui/react";
 
 async function getSectores() {
     try {
@@ -80,6 +80,7 @@ function App() {
                 status: 'info',
                 duration: 5000,
                 isClosable: true,
+                position: 'top-left'
             })
             
         }
@@ -96,30 +97,36 @@ function App() {
     },[])
 
     return (
-        <Box bg='#23272f' w={'100vw'} h={'100vh'}>
-            <FormControl>
 
-            <VStack>
+        <Stack bg='#23272f' w={'100vw'} h={'100vh'} divider={ <StackDivider borderColor='white'/> }>
+                
+        <HStack w={'100%'} justify='center' mt={'0.5rem'}>
+            <Text color={'#f6f7f9'} fontSize='4xl'>
+                Consulta de Productos
+            </Text>
+        </HStack>
 
-                <FormLabel color={'#f6f7f9'}>
-                    Consulta de Productos
-                </FormLabel>
+        <HStack w={'100%'} h={'100%'} align='flex-start'>
+            
 
-                <RadioGroup defaultValue="1" onChange={handleRadioChange}>
+            <VStack w={'23%'} spacing={'1rem'} mt={'2rem'}>
 
-                    <HStack>
-                        <Radio value="1" />
+
+                <RadioGroup defaultValue="1" onChange={handleRadioChange} >
+
+                    <Stack spacing={'1rem'}>
+                        <HStack >
+                            <Radio value="1" />
                             <Text color={'#f6f7f9'}>Sector</Text>
                             <Select bg={'#f6f7f9'} onChange={(event) => setSelectedSector(event.target.value)}>
                                 {sectores.map((sector, index) => 
                                     <option key={index}>{sector.desc_sector}</option>)
                                 }
                             </Select >
+                        </HStack>
 
-                    </HStack>
-
-                    <HStack>
-                        <Radio value="2"/>
+                        <HStack>
+                            <Radio value="2"/>
                             <Text color={'#f6f7f9'}>Repositor</Text>
                             <Select bg={'#f6f7f9'} onChange={(event) => setSelectedRepositor(event.target.value)}>
                                 {
@@ -127,15 +134,15 @@ function App() {
                                     <option key={index}>{repositor.nombre}</option>)
                                 }
                             </Select>
-                    </HStack>
-
+                        </HStack>
+                    </Stack>
                 </RadioGroup>
 
                 <Button onClick={() => buscarProductos(selectedOption)}>Buscar producto</Button>
 
             </VStack>
-
-            </FormControl>
+            
+            <Stack w={'75%'} mt={'1rem'}>
 
             <TableContainer>
                 <Table color={"white"}>
@@ -160,8 +167,10 @@ function App() {
                 </Table>
             </TableContainer>
 
-        </Box>
+            </Stack>
 
+        </HStack>
+    </Stack>
     );
 }
  
